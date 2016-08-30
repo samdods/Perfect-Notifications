@@ -95,6 +95,8 @@ public enum IOSNotificationItem {
 	case contentAvailable
     /// aps category key
 	case category(String)
+    /// aps mutable-content key
+	case mutableContent
     /// custom payload data
 	case customPayload(String, Any)
 }
@@ -173,6 +175,9 @@ public class NotificationPusher {
 
 	/// Sets the apns-topic which will be used for iOS notifications.
 	public var apnsTopic: String?
+	
+	/// Sets the apns-collapse-id which will be used for iOS notifications.
+	public var apnsCollapseID: String?
 
 	var responses = [NotificationResponse]()
 	
@@ -340,6 +345,9 @@ public class NotificationPusher {
 		if let apnsTopic = apnsTopic {
             request.setHeader(.custom(name: "apns-topic"), value: apnsTopic)
 		}
+        if let apnsCollapseID = apnsCollapseID {
+            request.setHeader(.custom(name: "apns-collapse-id"), value: apnsCollapseID)
+        }
 		request.path = "/3/device/\(deviceToken)"
 		net.sendRequest(request) {
 			response, msg in
@@ -407,6 +415,8 @@ public class NotificationPusher {
 				aps["sound"] = s
 			case .contentAvailable:
 				aps["content-available"] = 1
+			case .mutableContent:
+				aps["mutable-content"] = 1
 			case .category(let s):
 				aps["category"] = s
 			case .customPayload(let s, let a):
